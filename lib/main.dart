@@ -18,7 +18,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Flutter Demo',
-      home: Lab3Page(),    );
+      home: const Lab2Page(),
+    );
   }
 }
 

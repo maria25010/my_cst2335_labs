@@ -1,29 +1,75 @@
 
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// This is the login page for Lab 2.
-/// StatefulWidget because the image and language can change.
 class Lab2Page extends StatefulWidget {
   const Lab2Page({super.key});
 
-  /// Creates the state for the login page.
   @override
   State<Lab2Page> createState() => _Lab2PageState();
 }
 
-/// Controls the login page, image, and language.
 class _Lab2PageState extends State<Lab2Page> {
-  final TextEditingController loginController =
-  TextEditingController();
+  final TextEditingController loginController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  final TextEditingController passwordController =
-  TextEditingController();
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
 
   String imageSource = 'images/question-mark.png';
   bool isEnglish = true;
 
-  /// Checks the password and changes the image.
+  @override
+  void initState() {
+    super.initState();
+    loadLogin();
+  }
+
+  // Load saved username and password.
+  Future<void> loadLogin() async {
+    final username = await storage.read(key: 'username');
+    final password = await storage.read(key: 'password');
+
+    if (!mounted) return;
+
+    if (username != null && password != null) {
+      setState(() {
+        loginController.text = username;
+        passwordController.text = password;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isEnglish
+                  ? 'Previous login information loaded'
+                  : 'Dados de login anteriores carregados',
+            ),
+          ),
+        );
+      });
+    }
+  }
+
+  // Save or delete login information.
+  Future<void> saveLogin(bool save) async {
+    if (save) {
+      await storage.write(
+        key: 'username',
+        value: loginController.text,
+      );
+      await storage.write(
+        key: 'password',
+        value: passwordController.text,
+      );
+    } else {
+      await storage.delete(key: 'username');
+      await storage.delete(key: 'password');
+    }
+  }
+
+  // Check password and show the dialog.
   void checkPassword() {
     setState(() {
       if (passwordController.text == 'ASDF') {
@@ -32,16 +78,43 @@ class _Lab2PageState extends State<Lab2Page> {
         imageSource = 'images/stop.png';
       }
     });
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isEnglish ? 'Save Login?' : 'Salvar login?'),
+        content: Text(
+          isEnglish
+              ? 'Would you like to save your username and password?'
+              : 'Você gostaria de salvar seu usuário e senha?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await saveLogin(false);
+            },
+            child: Text(isEnglish ? 'No' : 'Não'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await saveLogin(true);
+            },
+            child: Text(isEnglish ? 'Yes' : 'Sim'),
+          ),
+        ],
+      ),
+    );
   }
 
-  /// Changes between English and Portuguese.
+  // Change between English and Portuguese.
   void changeLanguage() {
     setState(() {
       isEnglish = !isEnglish;
     });
   }
 
-  /// Releases the text controllers.
   @override
   void dispose() {
     loginController.dispose();
@@ -49,15 +122,16 @@ class _Lab2PageState extends State<Lab2Page> {
     super.dispose();
   }
 
-  /// Builds the login screen.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFD8C2F5),
-        title: const Text(
-          'Flutter Demo Home Page',
-          style: TextStyle(color: Colors.black),
+        title: Text(
+          isEnglish
+              ? 'Flutter Demo Home Page'
+              : 'Página inicial do Flutter',
+          style: const TextStyle(color: Colors.black),
         ),
         actions: [
           TextButton(
@@ -82,9 +156,7 @@ class _Lab2PageState extends State<Lab2Page> {
                 TextField(
                   controller: loginController,
                   decoration: InputDecoration(
-                    labelText: isEnglish
-                        ? 'Login'
-                        : 'Usuário',
+                    labelText: isEnglish ? 'Login' : 'Usuário',
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -92,9 +164,7 @@ class _Lab2PageState extends State<Lab2Page> {
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: isEnglish
-                        ? 'Password'
-                        : 'Senha',
+                    labelText: isEnglish ? 'Password' : 'Senha',
                     border: const OutlineInputBorder(),
                   ),
                 ),
