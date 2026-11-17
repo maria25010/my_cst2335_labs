@@ -2,9 +2,15 @@
 import 'package:flutter/material.dart';
 import 'lab2.dart';
 import 'lab3.dart';
+import 'lab6.dart';
+import 'lab7.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 
 /// Starts the Flutter application.
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  databaseFactory = databaseFactoryFfiWeb;
   runApp(const MyApp());
 }
 
@@ -18,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Flutter Demo',
-      home: const Lab2Page(),
+      home: Lab7Page(),
     );
   }
 }
