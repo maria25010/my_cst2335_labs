@@ -1,0 +1,32 @@
+
+Week 4 - Test Plan
+
+Test 1: Login Dialog
+Steps: Enter a username and password and press Login.
+Expected: A dialog asks if the user wants to save the login information.
+Result: PASS
+
+Test 2: Save Login
+Steps: Enter Maria and ASDF, press Login, and select Yes.
+Expected: The username and password are saved.
+Result: PASS
+
+Test 3: Load Login
+Steps: Close and reopen the application after saving the login.
+Expected: The username and password fields are filled automatically.
+Result: PASS
+
+Test 4: Delete Login
+Steps: Press Login, select No, then close and reopen the application.
+Expected: The username and password fields are empty.
+Result: PASS
+
+Test 5: Language Translation
+Steps: Press PT and then press Entrar.
+Expected: The labels and login dialog appear in Portuguese.
+Result: PASS
+
+Test 6: Snackbar
+Steps: Save login information, close and reopen the application.
+Expected: A snackbar displays Previous login information loaded.
+Result: PASS
